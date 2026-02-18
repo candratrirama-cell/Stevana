@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stevana English Platform</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@800;900&display=swap');
+
+        :root {
+            --primary: #FF9F43;
+            --success: #2ECC71;
+            --danger: #FF7675;
+            --blue: #0984E3;
+            --bg: #6C5CE7;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--bg);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Splash Screen */
+        #splash {
+            position: fixed;
+            inset: 0;
+            background: var(--primary);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            cursor: pointer;
+            transition: 0.4s;
+        }
+
+        .container {
+            background: white;
+            width: 88%;
+            max-width: 420px;
+            border-radius: 35px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 12px 0px rgba(0,0,0,0.15);
+            position: relative;
+        }
+
+        .maskot-frame {
+            width: 150px; height: 150px;
+            margin: -95px auto 15px;
+            background: white;
+            border-radius: 50%;
+            border: 8px solid var(--primary);
+            overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .maskot-frame img { width: 90%; height: 90%; object-fit: contain; }
+
+        .bubble {
+            background: #F8F9FA;
+            border-radius: 25px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 4px solid #EDF2F7;
+            min-height: 110px;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+
+        .target-text { font-size: 1.4rem; color: var(--blue); font-weight: 900; margin-bottom: 8px; }
+        .feedback { font-size: 1.2rem; font-weight: 800; min-height: 24px; }
+
+        .word-ok { color: var(--success); text-shadow: 1px 1px #eef; }
+        .word-no { color: var(--danger); text-decoration: underline; }
+
+        .btn-game {
+            width: 100%; padding: 18px; border: none; border-radius: 25px;
+            font-size: 1.2rem; font-weight: 900; cursor: pointer;
+            margin-bottom: 12px; color: white; transition: 0.1s;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        .btn-play { background: #00B894; box-shadow: 0 6px 0 #00896F; }
+        .btn-mic { background: var(--primary); box-shadow: 0 6px 0 #E17055; }
+        .btn-mic.active { transform: translateY(4px); box-shadow: none; background: var(--danger); }
+
+        .nav { display: flex; gap: 10px; margin-top: 10px; }
+        .nav button { flex: 1; padding: 12px; border-radius: 18px; border: none; font-weight: 900; background: #E2E8F0; cursor: pointer; color: #4A5568; }
+
+        #level-tag { font-family: 'Fredoka One'; color: var(--primary); font-size: 1.5rem; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+<div id="splash" onclick="startGame()">
+    <h1 style="font-family:'Fredoka One'; font-size: 4.5rem; color: white; margin: 0; text-shadow: 4px 4px var(--blue);">STEVANA</h1>
+    <p style="color: white; font-weight: 900; font-size: 1.2rem; letter-spacing: 2px;">CLICK TO START!</p>
+</div>
+
+<div class="container">
+    <div class="maskot-frame">
+        <img id="m-img" src="https://i.ibb.co/xSr3XPBc/1771380820266-1.jpg">
+    </div>
+
+    <div id="level-tag">LEVEL 1</div>
+
+    <div class="bubble">
+        <div class="target-text" id="target">Are you ready?</div>
+        <div class="feedback" id="feedback"></div>
+    </div>
+
+    <button class="btn-game btn-play" onclick="playSfx('click'); playVoice()">🔊 LISTEN OYEN</button>
+    <button class="btn-game btn-mic" id="m-btn" onclick="startRec()">🎤 START SPEAKING</button>
+
+    <div class="nav">
+        <button onclick="nav(-1)">BACK</button>
+        <button onclick="nav(1)">NEXT</button>
+    </div>
+</div>
+
+<script>
+    const imgs = {
+        n: "https://i.ibb.co/xSr3XPBc/1771380820266-1.jpg",
+        t: "https://i.ibb.co/84znkmXT/1771380820266-2.jpg",
+        s: "https://i.ibb.co/2125B5Jd/1771380820266-3.jpg",
+        h: "https://i.ibb.co/XZ80xr1s/1771380820266-4.jpg"
+    };
+
+    const questions = [
+        "What is your name?", "How old are you?", "Are you a boy or a girl?", "What is your favorite color?", 
+        "What is your favorite food?", "Where do you live?", "Do you have a pet?", "What is your pet's name?", 
+        "What grade are you in?", "Who is your best friend?", "What do you like to do after school?", 
+        "What is your favorite subject?", "What time do you wake up?", "What do you eat for breakfast?", 
+        "What is your favorite game?", "Can you describe your house?", "What do you usually do on Sunday?", 
+        "What is your hobby and why do you like it?", "Who is your favorite teacher and why?", "What makes you happy?", 
+        "Can you describe your best friend?", "What do you want to be in the future?", "Why do you like your favorite food?", 
+        "What do you do when you feel bored?", "Tell me about your daily routine.", "Describe your favorite place.", 
+        "What are your strengths?", "What are your weaknesses?", "Tell me about your family.", "What is your biggest dream?", 
+        "Describe your favorite movie or cartoon.", "What do you usually do during holidays?", "Who inspires you the most?", 
+        "How do you help your parents at home?", "What would you do if you had a lot of money?", "Describe your school in detail.", 
+        "What problems do students face today?", "How can you improve your English speaking skill?", 
+        "What is more important: money or happiness? Why?", "If you could travel anywhere, where would you go and why?", 
+        "What are the advantages and disadvantages of social media?", "How can students manage their time well?", 
+        "What would you change about your school?", "Do you prefer studying alone or with friends? Why?", 
+        "What are the benefits of reading books?", "How can we protect the environment?", "What is the biggest challenge for teenagers today?", 
+        "How do you deal with failure?", "What skills are important for the future?", "What is your life goal and how will you achieve it?"
+    ];
+
+    let cur = 0;
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playBgm() {
+        setInterval(() => {
+            const notes = [392.00, 440.00, 493.88, 523.25]; 
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            o.type = 'triangle';
+            o.frequency.setValueAtTime(notes[Math.floor(Math.random()*notes.length)], ctx.currentTime);
+            g.gain.setValueAtTime(0.03, ctx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+            o.connect(g); g.connect(ctx.destination);
+            o.start(); o.stop(ctx.currentTime + 0.8);
+        }, 500);
+    }
+
+    function playSfx(type) {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        if(type==='win') { o.frequency.setValueAtTime(600, ctx.currentTime); o.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime+0.2); }
+        else if(type==='lose') { o.frequency.setValueAtTime(300, ctx.currentTime); o.frequency.linearRampToValueAtTime(100, ctx.currentTime+0.3); }
+        o.start(); o.stop(ctx.currentTime+0.3);
+    }
+
+    function startGame() {
+        document.getElementById('splash').style.opacity = '0';
+        setTimeout(() => document.getElementById('splash').style.display = 'none', 400);
+        playBgm();
+        // SUARA STEVANA SESUAI KODE KAMU
+        const ut = new SpeechSynthesisUtterance("Ste vana!");
+        ut.pitch = 2; ut.rate = 1.2; window.speechSynthesis.speak(ut);
+        render();
+    }
+
+    function render() {
+        document.getElementById('target').innerText = questions[cur];
+        document.getElementById('level-tag').innerText = `LEVEL ${cur+1}`;
+        document.getElementById('m-img').src = imgs.n;
+        document.getElementById('feedback').innerHTML = "";
+    }
+
+    function playVoice() {
+        const u = new SpeechSynthesisUtterance(questions[cur]);
+        u.lang = 'en-US'; u.rate = 0.9; window.speechSynthesis.speak(u);
+    }
+
+    function startRec() {
+        const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if(!Rec) return alert("Please use Chrome/Edge!");
+        const r = new Rec(); r.lang = 'en-US';
+        r.onstart = () => {
+            document.getElementById('m-btn').classList.add('active');
+            document.getElementById('m-btn').innerText = "OYEN LISTENING...";
+            document.getElementById('m-img').src = imgs.t;
+        };
+        r.onresult = (e) => {
+            document.getElementById('m-btn').classList.remove('active');
+            document.getElementById('m-btn').innerText = "🎤 START SPEAKING";
+            check(e.results[0][0].transcript.toLowerCase());
+        };
+        r.onerror = () => {
+            document.getElementById('m-btn').classList.remove('active');
+            document.getElementById('m-btn').innerText = "🎤 START SPEAKING";
+            document.getElementById('m-img').src = imgs.n;
+        };
+        r.start();
+    }
+
+    function check(say) {
+        const targetWords = questions[cur].toLowerCase().replace(/[^\w\s]/g, "").split(" ");
+        const userWords = say.split(" ");
+        let html = ""; let hits = 0;
+        
+        targetWords.forEach(w => {
+            if(userWords.includes(w)) { html += `<span class="word-ok">${w}</span> `; hits++; }
+            else { html += `<span class="word-no">${w}</span> `; }
+        });
+
+        document.getElementById('feedback').innerHTML = html;
+        if(hits/targetWords.length >= 0.75) {
+            playSfx('win'); document.getElementById('m-img').src = imgs.h;
+        } else {
+            playSfx('lose'); document.getElementById('m-img').src = imgs.s;
+        }
+    }
+
+    function nav(d) {
+        cur = Math.max(0, Math.min(questions.length-1, cur + d));
+        render();
+    }
+</script>
+</body>
+</html>
