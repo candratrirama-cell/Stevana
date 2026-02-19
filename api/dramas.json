@@ -1,0 +1,62 @@
+[
+  {
+    "id": "1",
+    "title": "Drama 1",
+    "poster": "https://hwztvideo.dramaboxdb.com/83/8x8/88x8/888x2/88820000024/700173333_1/700173333.mp4.jpg",
+    "episodes": [
+      { "id": "1", "url": "https://hwztvideo.dramaboxdb.com/33/8x8/88x8/888x2/88820000024/700173333_1/700173333.1080p.wz.g264.mp4?Expires=1771484400&Signature=Kl3RoHp-NGSyO2nWAFlMcD350CXuOzvWw9OYu1g5z6TjXIGNBblnm5h5jQUkyrjyO0PYtDRiYvOmemGL1Q3eryx050rKTWX8WwSG80HbuvmurPzMXy63dhi5OsxeQXo2VgFQgj6bIXumDcvNN7nO9LFXM6l54OMC-hPiQ72alF3geeaZyXykXrSSz0MCuF1zMiaKDO5o1Bu18JvcLbAOdtajtL" },
+      { "id": "2", "url": "https://hwztvideo.dramaboxdb.com/33/8x8/88x8/888x2/88820000024/700173334_1/700173334.1080p.wz.g264.mp4?Expires=1771484400&Signature=..." },
+      { "id": "3", "url": "https://hwztvideo.dramaboxdb.com/33/8x8/88x8/888x2/88820000024/700173335_1/700173335.1080p.wz.g264.mp4?Expires=1771484400&Signature=..." },
+      { "id": "4", "url": "https://hwztvideo.dramaboxdb.com/33/8x8/88x8/888x2/88820000024/700173336_1/700173336.1080p.wz.g264.mp4?Expires=1771484400&Signature=..." },
+      { "id": "5", "url": "https://hwztvideo.dramaboxdb.com/33/8x8/88x8/888x2/88820000024/700173337_1/700173337.1080p.wz.g264.mp4?Expires=1771484400&Signature=..." }
+    ]
+  },
+  {
+    "id": "2",
+    "title": "Drama 2",
+    "poster": "https://hwztvideo.dramaboxdb.com/71/1x5/15x6/156x0/15600000024/700041512_1/700041512.mp4.jpg",
+    "episodes": [
+      { "id": "1", "url": "https://hwztvideo.dramaboxdb.com/21/1x5/15x6/156x0/15600000024/700041512_1/700041512.1080p.wz.g264.mp4?Expires=1771484400&Signature=..." },
+      { "id": "2", "url": "https://hwztvideo.dramaboxdb.com/21/1x5/15x6/156x0/15600000024/700041513_1/700041513.1080p.wz.g264.mp4?Expires=1771484400&Signature=..." },
+      { "id": "3", "url": "https://hwztvideo.dramaboxdb.com/21/1x5/15x6/156x0/15600000024/700041514_1/700041514.1080p.wz.g264.mp4?Expires=1771484400&Signature=..." },
+      { "id": "4", "url": "https://hwztvideo.dramaboxdb.com/21/1x5/15x6/156x0/15600000024/700041515_1/700041515.1080p.wz.g264.mp4?Expires=1771484400&Signature=..." },
+      { "id": "5", "url": "https://hwztvideo.dramaboxdb.com/21/1x5/15x6/156x0/15600000024/700041516_1/700041516.1080p.wz.g264.mp4?Expires=1771484400&Signature=..." }
+    ]
+  },
+  {
+    "id": "3",
+    "title": "Drama 3",
+    "poster": "https://hwztvideo.dramaboxdb.com/08/7x0/70x6/706x0/70600000024/700038780_1/700038780.mp4.jpg",
+    "episodes": [
+      { "id": "1", "url": "https://hwztvideo.dramaboxdb.com/08/7x0/70x6/706x0/70600000024/700038780_1/700038780.1080p.wz.g264.mp4?Expires=1771484400&Signature=..." },
+      { "id": "2", "url": "https://hwztvideo.dramaboxdb.com/08/7x0/70x6/706x0/70600000024/700038781_1/700038781.1080p.wz.g264.mp4?Expires=1771484400&Signature=..." },
+      { "id": "3", "url": "https://hwztvideo.dramaboxdb.com/08/7x0/70x6/706x0/70600000024/700038782_1/700038782.1080p.wz.g264.mp4?Expires=1771484400&Signature=..." },
+      { "id": "4", "url": "https://hwztvideo.dramaboxdb.com/08/7x0/70x6/706x0/70600000024/700038783_1/700038783.1080p.wz.g264.mp4?Expires=1771484400&Signature=..." },
+      { "id": "5", "url": "https://hwztvideo.dramaboxdb.com/08/7x0/70x6/706x0/70600000024/700038784_1/700038784.1080p.wz.g264.mp4?Expires=1771484400&Signature=..." }
+    ]
+  },
+  {
+    "id": "5",
+    "title": "Drama 5",
+    "poster": "https://hwztvideo.dramaboxdb.com/24/7x7/77x1/771x3/77131100014/588706536_1/588706536.mp4.jpg",
+    "episodes": [
+      { "id": "1", "url": "https://hwztvideo.dramaboxdb.com/63/7x7/77x1/771x3/77131100014/588706536_1/588706536.1080p.wz.g264.mp4?Expires=1771484400&Signature=..." },
+      { "id": "2", "url": "https://hwztvideo.dramaboxdb.com/63/7x7/77x1/771x3/77131100014/588706537_1/588706537.1080p.wz.g264.mp4?Expires=1771484400&Signature=..." },
+      { "id": "3", "url": "https://hwztvideo.dramaboxdb.com/63/7x7/77x1/771x3/77131100014/588706538_1/588706538.1080p.wz.g264.mp4?Expires=1771484400&Signature=..." },
+      { "id": "4", "url": "https://hwztvideo.dramaboxdb.com/63/7x7/77x1/771x3/77131100014/588706539_1/588706539.1080p.wz.g264.mp4?Expires=1771484400&Signature=..." },
+      { "id": "5", "url": "https://hwztvideo.dramaboxdb.com/63/7x7/77x1/771x3/77131100014/588706540_1/588706540.1080p.wz.g264.mp4?Expires=1771484400&Signature=..." }
+    ]
+  },
+  {
+    "id": "6",
+    "title": "Drama 6",
+    "poster": "https://hwztvideo.dramaboxdb.com/62/2x4/24x4/244x5/24450000024/700352721_1/700352721.mp4.jpg",
+    "episodes": [
+      { "id": "1", "url": "https://hwztvideo.dramaboxdb.com/12/2x4/24x4/244x5/24450000024/700352721_1/700352721.1080p.nav2.mp4?Expires=1771484400&Signature=..." },
+      { "id": "2", "url": "https://hwztvideo.dramaboxdb.com/12/2x4/24x4/244x5/24450000024/700352722_1/700352722.1080p.nav2.mp4?Expires=1771484400&Signature=..." },
+      { "id": "3", "url": "https://hwztvideo.dramaboxdb.com/12/2x4/24x4/244x5/24450000024/700352723_1/700352723.1080p.nav2.mp4?Expires=1771484400&Signature=..." },
+      { "id": "4", "url": "https://hwztvideo.dramaboxdb.com/12/2x4/24x4/244x5/24450000024/700352724_1/700352724.1080p.nav2.mp4?Expires=1771484400&Signature=..." },
+      { "id": "5", "url": "https://hwztvideo.dramaboxdb.com/12/2x4/24x4/244x5/24450000024/700352725_1/700352725.1080p.nav2.mp4?Expires=1771484400&Signature=..." }
+    ]
+  }
+]
