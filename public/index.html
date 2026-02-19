@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Flydrama - Premium Drama Shorts</title>
+    <style>
+        /* --- FLYDRAMA PREMIUM UI (NETFLIX STYLE) --- */
+        :root {
+            --bg-color: #050505;
+            --surface: #121212;
+            --primary: #e50914; /* Netflix Red */
+            --primary-hover: #ff1a25;
+            --text-main: #ffffff;
+            --text-dim: #b3b3b3;
+            --glass: rgba(255, 255, 255, 0.1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Navigasi */
+        header {
+            padding: 15px 5%;
+            position: fixed;
+            top: 0; width: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+
+        header.scrolled { background: var(--bg-color); border-bottom: 1px solid #222; }
+
+        header h1 { 
+            font-size: 1.6rem; 
+            font-weight: 800; 
+            letter-spacing: -1.5px; 
+            color: var(--primary);
+            text-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
+            cursor: pointer;
+        }
+        header h1 span { color: white; }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid #444;
+            padding: 5px 12px;
+            border-radius: 4px;
+        }
+        #search-input {
+            background: transparent; border: none; color: white; outline: none;
+            width: 120px; font-size: 0.9rem; transition: width 0.3s;
+        }
+        #search-input:focus { width: 200px; }
+
+        /* Hero / Banner */
+        .hero {
+            height: 60vh;
+            background: linear-gradient(to top, var(--bg-color), transparent), url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1450&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 5%;
+            margin-bottom: 20px;
+        }
+        .hero-tag { color: var(--primary); font-weight: bold; font-size: 0.8rem; margin-bottom: 5px; }
+        .hero-title { font-size: 2.5rem; font-weight: 800; margin-bottom: 15px; max-width: 600px; line-height: 1; }
+
+        /* Main Content */
+        .section-title { padding: 0 5%; margin-bottom: 15px; font-size: 1.2rem; font-weight: 600; }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 12px;
+            padding: 0 5% 50px 5%;
+        }
+
+        @media (min-width: 768px) {
+            .grid-container { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+        }
+
+        .drama-card {
+            position: relative;
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--surface);
+        }
+        .drama-card:hover { transform: scale(1.05); z-index: 2; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .drama-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+        
+        .drama-badge {
+            position: absolute; top: 8px; left: 8px;
+            background: var(--primary); color: white;
+            padding: 2px 6px; font-size: 0.6rem; font-weight: bold; border-radius: 2px;
+        }
+
+        .drama-info {
+            position: absolute; bottom: 0; width: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,1) 0%, transparent 100%);
+            padding: 15px 8px 8px 8px;
+        }
+        .drama-title { font-size: 0.8rem; font-weight: 500; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* Fullscreen Player */
+        #player-view {
+            position: fixed; inset: 0; background: #000; z-index: 1000;
+            display: none; flex-direction: column;
+        }
+        #player-view.active { display: flex; animation: fadeIn 0.4s; }
+
+        .video-wrapper { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; }
+        video { width: 100%; max-height: 100%; outline: none; }
+
+        .close-btn {
+            position: absolute; top: 20px; left: 20px;
+            background: rgba(255,255,255,0.2); border: none; color: white;
+            width: 40px; height: 40px; border-radius: 50%; backdrop-filter: blur(10px); cursor: pointer;
+        }
+
+        /* Episode Drawer */
+        .episodes-panel {
+            background: var(--surface);
+            padding: 20px;
+            border-top: 1px solid #333;
+            max-height: 40vh;
+            overflow-y: auto;
+        }
+        .episodes-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 10px; margin-top: 15px;
+        }
+        .ep-box {
+            background: #252525; border: 1px solid #333; color: white;
+            padding: 12px 0; text-align: center; border-radius: 4px; font-weight: 600; cursor: pointer;
+        }
+        .ep-box.active { background: var(--primary); border-color: var(--primary); }
+
+        /* Loader */
+        .loader-container { padding: 50px; text-align: center; }
+        .spinner {
+            width: 40px; height: 40px; border: 3px solid #333; border-top-color: var(--primary);
+            border-radius: 50%; animation: spin 1s linear infinite; display: inline-block;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div id="home-view">
+        <header id="navbar">
+            <h1 onclick="location.reload()">FLY<span>DRAMA</span></h1>
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Cari drama...">
+                <span style="cursor:pointer" onclick="handleSearch()">🔍</span>
+            </div>
+        </header>
+
+        <section class="hero">
+            <div class="hero-tag">FLY<span>DRAMA</span> ORIGINAL</div>
+            <div class="hero-title">Temukan Ribuan Drama Pendek Seru Setiap Hari</div>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="scrollToContent()" style="background: white; border: none; padding: 10px 25px; border-radius: 4px; font-weight: bold; cursor: pointer;">Putar Sekarang</button>
+                <button style="background: rgba(100,100,100,0.5); border: none; color: white; padding: 10px 25px; border-radius: 4px; font-weight: bold; backdrop-filter: blur(10px);">Voucher 4RB</button>
+            </div>
+        </section>
+
+        <h3 class="section-title">Trending Sekarang</h3>
+        <div id="loading" class="loader-container"><div class="spinner"></div></div>
+        <div id="drama-list" class="grid-container"></div>
+
+        <footer style="text-align: center; padding: 50px; color: #555; font-size: 0.8rem; border-top: 1px solid #111;">
+            © 2026 Flydrama Entertainment. Developed by @maramadhona
+        </footer>
+    </div>
+
+    <div id="player-view">
+        <button class="close-btn" onclick="closePlayer()">✕</button>
+        <div class="video-wrapper">
+            <video id="main-video" controls playsinline autoplay></video>
+        </div>
+        <div class="episodes-panel">
+            <h4 id="player-title" style="margin-bottom: 5px;">Judul Drama</h4>
+            <p style="font-size: 0.8rem; color: #888; margin-bottom: 15px;">Pilih Episode:</p>
+            <div id="ep-grid" class="episodes-grid"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/index';
+
+        window.onscroll = () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) nav.classList.add('scrolled');
+            else nav.classList.remove('scrolled');
+        };
+
+        window.onload = loadHome;
+
+        async function loadHome() {
+            try {
+                const res = await fetch(`${API_BASE}?type=home`);
+                const data = await res.json();
+                renderDramas(data);
+            } catch (e) {
+                document.getElementById('drama-list').innerHTML = `<p style="padding: 20px;">Gagal terhubung ke API Vercel.</p>`;
+            }
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function handleSearch() {
+            const q = document.getElementById('search-input').value;
+            if (q) doSearch(q);
+        }
+
+        document.getElementById('search-input').onkeypress = (e) => {
+            if (e.key === 'Enter') handleSearch();
+        };
+
+        async function doSearch(q) {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('drama-list').innerHTML = '';
+            try {
+                const res = await fetch(`${API_BASE}?type=search&query=${encodeURIComponent(q)}`);
+                const data = await res.json();
+                renderDramas(data);
+            } catch (e) { alert("Pencarian error"); }
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function renderDramas(data) {
+            const container = document.getElementById('drama-list');
+            container.innerHTML = '';
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'drama-card';
+                card.innerHTML = `
+                    <div class="drama-badge">NEW</div>
+                    <img src="${item.image}" alt="">
+                    <div class="drama-info">
+                        <div class="drama-title">${item.title}</div>
+                    </div>
+                `;
+                card.onclick = () => openPlayer(item.url, item.title);
+                container.appendChild(card);
+            });
+        }
+
+        async function openPlayer(url, title) {
+            const view = document.getElementById('player-view');
+            const video = document.getElementById('main-video');
+            const epGrid = document.getElementById('ep-grid');
+            
+            view.classList.add('active');
+            document.getElementById('player-title').innerText = title;
+            epGrid.innerHTML = 'Loading episodes...';
+
+            try {
+                const res = await fetch(`${API_BASE}?type=detail&url=${encodeURIComponent(url)}`);
+                const data = await res.json();
+                
+                epGrid.innerHTML = '';
+                data.episodes.forEach(ep => {
+                    const box = document.createElement('div');
+                    box.className = 'ep-box';
+                    box.innerText = ep.episode_id;
+                    box.onclick = () => {
+                        video.src = `${API_BASE}?type=stream&url=${encodeURIComponent(ep.url)}`;
+                        document.querySelectorAll('.ep-box').forEach(b => b.classList.remove('active'));
+                        box.classList.add('active');
+                    };
+                    epGrid.appendChild(box);
+                });
+
+                if(data.episodes.length > 0) {
+                    video.src = `${API_BASE}?type=stream&url=${encodeURIComponent(data.episodes[0].url)}`;
+                    epGrid.firstChild.classList.add('active');
+                }
+            } catch (e) { epGrid.innerText = 'Gagal memuat episode.'; }
+        }
+
+        function closePlayer() {
+            const view = document.getElementById('player-view');
+            const video = document.getElementById('main-video');
+            view.classList.remove('active');
+            video.pause();
+            video.src = '';
+        }
+
+        function scrollToContent() {
+            window.scrollTo({ top: 500, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
