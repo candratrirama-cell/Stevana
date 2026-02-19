@@ -2,236 +2,138 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Flydrama - Premium Drama Shorts</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flydrama - Netflix Experience</title>
     <style>
-        :root {
-            --netflix-red: #e50914;
-            --bg-black: #080808;
-            --card-gray: #141414;
-            --text-white: #ffffff;
-            --text-gray: #a3a3a3;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg-black); color: var(--text-white); overflow-x: hidden; }
-
-        /* HEADER */
-        header {
-            position: fixed; top: 0; width: 100%; z-index: 1000;
-            padding: 15px 5%; display: flex; justify-content: space-between; align-items: center;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
-            transition: 0.3s;
-        }
-        header.scrolled { background: var(--bg-black); border-bottom: 1px solid #222; }
-        header h1 { color: var(--netflix-red); font-weight: 900; font-size: 1.8rem; cursor: pointer; }
-        header h1 span { color: white; }
-
-        .search-bar { display: flex; align-items: center; background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px; border: 1px solid #333; }
-        .search-bar input { background: transparent; border: none; color: white; outline: none; width: 150px; font-size: 0.9rem; }
-
-        /* HERO SECTION */
-        .hero {
-            height: 70vh; width: 100%;
-            background: linear-gradient(to top, var(--bg-black), transparent), url('https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=1470&auto=format&fit=crop');
-            background-size: cover; background-position: center;
-            display: flex; flex-direction: column; justify-content: flex-end; padding: 5%;
-        }
-        .hero h2 { font-size: 3rem; font-weight: 900; margin-bottom: 10px; line-height: 1; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); }
-        .hero p { color: var(--text-gray); max-width: 500px; margin-bottom: 20px; }
-        .btn-play { background: white; color: black; border: none; padding: 12px 30px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 1rem; }
-
-        /* DRAMA GRID */
-        .content-section { padding: 20px 5%; }
-        .section-title { font-size: 1.3rem; margin-bottom: 20px; font-weight: 700; border-left: 4px solid var(--netflix-red); padding-left: 10px; }
+        :root { --red: #E50914; --black: #000; --gray: #141414; }
+        body { background: var(--black); color: #fff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; }
         
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-            gap: 15px;
+        /* Navbar */
+        header { 
+            padding: 20px 5%; position: fixed; top: 0; width: 100%; z-index: 100;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+            display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;
+        }
+        header h1 { color: var(--red); margin: 0; font-size: 1.8rem; letter-spacing: -1px; }
+
+        /* Grid Netflix */
+        .container { padding: 80px 5% 20px; }
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
+            gap: 10px; 
+        }
+        @media(min-width: 768px) { .grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); } }
+
+        .card { 
+            position: relative; transition: 0.3s; cursor: pointer; border-radius: 4px; overflow: hidden;
+            background: var(--gray); aspect-ratio: 2/3;
+        }
+        .card:hover { transform: scale(1.05); z-index: 10; }
+        .card img { width: 100%; height: 100%; object-fit: cover; }
+        .card-title { 
+            position: absolute; bottom: 0; padding: 10px; width: 100%;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
+            font-size: 0.8rem; font-weight: bold; box-sizing: border-box;
         }
 
-        .card {
-            background: var(--card-gray); border-radius: 8px; overflow: hidden;
-            transition: transform 0.3s ease, border 0.3s; cursor: pointer; position: relative;
-            border: 1px solid transparent;
+        /* Player Overlay */
+        #player { 
+            position: fixed; inset: 0; background: #000; z-index: 999; 
+            display: none; flex-direction: column; 
         }
-        .card:hover { transform: scale(1.05); border: 1px solid var(--netflix-red); z-index: 10; }
-        .card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; background: #222; }
-        .card-info { padding: 10px; background: linear-gradient(to top, black, transparent); position: absolute; bottom: 0; width: 100%; }
-        .card-title { font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* PLAYER OVERLAY */
-        #player-overlay {
-            position: fixed; inset: 0; background: #000; z-index: 2000;
-            display: none; flex-direction: column; animation: fadeIn 0.3s;
-        }
-        #player-overlay.active { display: flex; }
-        .video-container { flex: 1; display: flex; align-items: center; background: #000; position: relative; }
+        .video-box { flex: 1; display: flex; align-items: center; justify-content: center; background: #000; }
         video { width: 100%; max-height: 80vh; }
-        
-        .close-player { position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.6); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; z-index: 100; cursor: pointer; font-size: 1.2rem; }
-
-        /* EPISODES DRAWER */
-        .episodes-area { background: #111; padding: 20px; border-top: 1px solid #222; max-height: 40%; overflow-y: auto; }
-        .ep-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; }
-        .ep-item { background: #222; border: 1px solid #333; color: white; padding: 12px; text-align: center; border-radius: 5px; font-weight: bold; cursor: pointer; }
-        .ep-item.active { background: var(--netflix-red); border-color: var(--netflix-red); }
-
-        /* LOADING SPINNER */
-        .loader { width: 50px; height: 50px; border: 5px solid #222; border-top-color: var(--netflix-red); border-radius: 50%; animation: spin 1s linear infinite; margin: 50px auto; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        @media (min-width: 768px) {
-            .grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
-            .ep-grid { grid-template-columns: repeat(10, 1fr); }
+        .ep-list { 
+            height: 30%; background: #111; padding: 20px; overflow-y: auto; 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); gap: 10px;
+        }
+        .ep-item { 
+            background: #333; padding: 10px; text-align: center; border-radius: 4px; 
+            cursor: pointer; font-weight: bold; 
+        }
+        .ep-item.active { background: var(--red); }
+        .close-btn { 
+            position: absolute; top: 20px; left: 20px; z-index: 1001;
+            background: rgba(255,255,255,0.2); border: none; color: #fff;
+            width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <header id="main-nav">
-        <h1 onclick="location.reload()">FLY<span>DRAMA</span></h1>
-        <div class="search-bar">
-            <input type="text" id="search-input" placeholder="Cari drama favorit...">
-            <span onclick="doSearch()" style="cursor:pointer">🔍</span>
-        </div>
-    </header>
+<header>
+    <h1>FLY<span>DRAMA</span></h1>
+</header>
 
-    <div id="home-content">
-        <div class="hero">
-            <p style="color:var(--netflix-red); font-weight:bold; letter-spacing: 2px;">TRENDING SEKARANG</p>
-            <h2>Drama Pendek Pilihan</h2>
-            <p>Nonton ribuan episode drama pendek seru dengan kualitas HD hanya di Flydrama.</p>
-            <div>
-                <button class="btn-play" onclick="window.scrollTo({top: 600, behavior: 'smooth'})">Mulai Nonton</button>
-            </div>
-        </div>
+<div class="container">
+    <h2 id="status">Memuat Drama Populer...</h2>
+    <div id="drama-grid" class="grid"></div>
+</div>
 
-        <div class="content-section">
-            <h3 class="section-title">Drama Terpopuler</h3>
-            <div id="loader" class="loader"></div>
-            <div id="drama-grid" class="grid"></div>
-        </div>
+<div id="player">
+    <button class="close-btn" onclick="closePlayer()">✕</button>
+    <div class="video-box">
+        <video id="vid" controls autoplay playsinline></video>
     </div>
+    <div id="episodes" class="ep-list"></div>
+</div>
 
-    <div id="player-overlay">
-        <button class="close-player" onclick="closePlayer()">✕</button>
-        <div class="video-container">
-            <video id="video-player" controls playsinline autoplay></video>
-        </div>
-        <div class="episodes-area">
-            <h3 id="player-drama-title">Judul Drama</h3>
-            <p style="font-size: 0.8rem; color: var(--text-gray); margin-top: 5px;">Pilih Episode:</p>
-            <div id="ep-grid" class="ep-grid"></div>
-        </div>
-    </div>
+<script>
+    const API = '/api/index';
 
-    <script>
-        const API_BASE = '/api/index';
+    async function loadHome() {
+        const res = await fetch(`${API}?type=home`);
+        const data = await res.json();
+        const grid = document.getElementById('drama-grid');
+        grid.innerHTML = '';
+        document.getElementById('status').innerText = 'Trending Sekarang';
+        
+        data.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <img src="${item.image}" onerror="this.src='https://via.placeholder.com/200x300?text=No+Poster'">
+                <div class="card-title">${item.title}</div>
+            `;
+            card.onclick = () => openDrama(item.url);
+            grid.appendChild(card);
+        });
+    }
 
-        window.onscroll = () => {
-            const nav = document.getElementById('main-nav');
-            if (window.scrollY > 50) nav.classList.add('scrolled');
-            else nav.classList.remove('scrolled');
-        };
+    async function openDrama(url) {
+        document.getElementById('player').style.display = 'flex';
+        const epDiv = document.getElementById('episodes');
+        epDiv.innerHTML = 'Memuat Episode...';
+        
+        const res = await fetch(`${API}?type=detail&url=${encodeURIComponent(url)}`);
+        const data = await res.json();
+        
+        epDiv.innerHTML = '';
+        data.episodes.forEach((ep, i) => {
+            const div = document.createElement('div');
+            div.className = 'ep-item';
+            div.innerText = ep.episode_id;
+            div.onclick = () => playEp(ep.url, div);
+            epDiv.appendChild(div);
+            if(i === 0) playEp(ep.url, div); // Putar ep 1 otomatis
+        });
+    }
 
-        window.onload = loadDramas;
+    function playEp(url, el) {
+        const v = document.getElementById('vid');
+        v.src = `${API}?type=stream&url=${encodeURIComponent(url)}`;
+        document.querySelectorAll('.ep-item').forEach(x => x.classList.remove('active'));
+        el.classList.add('active');
+        v.play();
+    }
 
-        async function loadDramas() {
-            try {
-                const res = await fetch(`${API_BASE}?type=home`);
-                const data = await res.json();
-                renderCards(data);
-            } catch (e) {
-                console.error("Gagal load API");
-            }
-            document.getElementById('loader').style.display = 'none';
-        }
+    function closePlayer() {
+        document.getElementById('player').style.display = 'none';
+        document.getElementById('vid').pause();
+    }
 
-        async function doSearch() {
-            const query = document.getElementById('search-input').value;
-            if (!query) return;
-            document.getElementById('loader').style.display = 'block';
-            document.getElementById('drama-grid').innerHTML = '';
-            try {
-                const res = await fetch(`${API_BASE}?type=search&query=${encodeURIComponent(query)}`);
-                const data = await res.json();
-                renderCards(data);
-            } catch (e) { alert("Error mencari"); }
-            document.getElementById('loader').style.display = 'none';
-        }
-
-        function renderCards(data) {
-            const container = document.getElementById('drama-grid');
-            container.innerHTML = '';
-            data.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                // Penanganan Poster agar tidak pecah/kosong
-                const imgUrl = item.image || 'https://via.placeholder.com/300x450?text=No+Image';
-                card.innerHTML = `
-                    <img src="${imgUrl}" loading="lazy">
-                    <div class="card-info">
-                        <div class="card-title">${item.title}</div>
-                    </div>
-                `;
-                card.onclick = () => openDrama(item.url, item.title);
-                container.appendChild(card);
-            });
-        }
-
-        async function openDrama(url, title) {
-            const overlay = document.getElementById('player-overlay');
-            const epGrid = document.getElementById('ep-grid');
-            const playerTitle = document.getElementById('player-drama-title');
-            
-            overlay.classList.add('active');
-            playerTitle.innerText = title;
-            epGrid.innerHTML = '<p>Memuat Episode...</p>';
-
-            try {
-                const res = await fetch(`${API_BASE}?type=detail&url=${encodeURIComponent(url)}`);
-                const data = await res.json();
-                
-                epGrid.innerHTML = '';
-                data.episodes.forEach((ep, index) => {
-                    const btn = document.createElement('div');
-                    btn.className = 'ep-item';
-                    btn.innerText = ep.episode_id;
-                    btn.onclick = () => playVideo(ep.url, btn);
-                    epGrid.appendChild(btn);
-                    
-                    // Putar episode 1 otomatis
-                    if(index === 0) playVideo(ep.url, btn);
-                });
-            } catch (e) {
-                epGrid.innerHTML = '<p>Gagal memuat episode.</p>';
-            }
-        }
-
-        function playVideo(vUrl, element) {
-            const video = document.getElementById('video-player');
-            video.src = `${API_BASE}?type=stream&url=${encodeURIComponent(vUrl)}`;
-            video.play();
-            
-            document.querySelectorAll('.ep-item').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
-        }
-
-        function closePlayer() {
-            const overlay = document.getElementById('player-overlay');
-            const video = document.getElementById('video-player');
-            overlay.classList.remove('active');
-            video.pause();
-            video.src = '';
-        }
-
-        document.getElementById('search-input').onkeypress = (e) => {
-            if (e.key === 'Enter') doSearch();
-        };
-    </script>
+    loadHome();
+</script>
 </body>
 </html>
