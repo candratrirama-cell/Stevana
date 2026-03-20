@@ -1,6 +1,6 @@
 /**
  * Payment System for @maramadhona
- * Powered by Hokto API
+ * Powered by Hokto API & node-qrcode
  */
 
 const CONFIG = {
@@ -28,7 +28,7 @@ async function prosesDonasi() {
     const partnerRef = "MARA-" + Date.now();
 
     try {
-        // 1. Request QRIS
+        // 1. Request QRIS ke API Hokto
         const response = await fetch(`${CONFIG.BASE_URL}?api=create_qris`, {
             method: "POST",
             headers: {
@@ -43,31 +43,58 @@ async function prosesDonasi() {
 
         const result = await response.json();
 
-        if (result.status === "success" || result.qrString) {
-            // Tampilkan QRIS
-            // Catatan: Jika API mengembalikan string QR, gunakan generator library 
-            // atau jika API mengembalikan URL gambar, langsung masukkan ke src.
-            document.getElementById('qris-image').src = result.qrString || result.qrUrl;
+        // Cek apakah data QRIS teks mentah (raw) tersedia
+        if (result.qrString) {
             
-            document.getElementById('setup-area').classList.add('hidden');
-            document.getElementById('qris-area').classList.remove('hidden');
+            // PERBAIKAN: Gunakan library QRCode untuk menggambar teks raw ke Canvas
+            const canvas = document.getElementById('qris-canvas');
+            
+            // Konfigurasi visual QR Code
+            QRCode.toCanvas(canvas, result.qrString, { 
+                width: 256, // Ukuran gambar
+                margin: 1,  // Border putih di sekitar QR
+                color: {
+                    dark: '#000000',  // Warna QR
+                    light: '#FFFFFF'  // Warna Background
+                },
+                errorCorrectionLevel: 'M' // Tingkat koreksi kesalahan (Medium)
+            }, function (error) {
+                if (error) {
+                    console.error(error);
+                    alert("Gagal menggambar QR Code.");
+                } else {
+                    console.log('QR Code success generated!');
+                    
+                    // Tampilkan area QRIS dan sembunyikan form
+                    document.getElementById('display-amount').innerText = `Rp ${amount.toLocaleString('id-ID')}`;
+                    document.getElementById('setup-area').classList.add('hidden');
+                    document.getElementById('qris-area').classList.remove('hidden');
 
-            // 2. Jalankan pengecekan otomatis
-            mulaiCekStatus(partnerRef);
+                    // 2. Jalankan pengecekan otomatis
+                    mulaiCekStatus(partnerRef);
+                }
+            });
+
         } else {
-            throw new Error("Gagal mendapatkan QRIS");
+            throw new Error("Gagal mendapatkan data QRIS dari API.");
         }
 
     } catch (error) {
         console.error("Error:", error);
-        alert("Waduh, ada gangguan koneksi ke API.");
+        alert("Waduh, ada gangguan koneksi ke API atau API Key salah.");
         btn.disabled = false;
         btn.innerText = "GAS DONASI!";
     }
 }
 
 function mulaiCekStatus(ref) {
-    const checkTimer = setInterval(async () => {
+    // Reset counter
+    pollingCounter = 0;
+    
+    // Hapus interval lama jika ada
+    if (window.checkTimer) clearInterval(window.checkTimer);
+
+    window.checkTimer = setInterval(async () => {
         pollingCounter++;
         
         try {
@@ -76,19 +103,21 @@ function mulaiCekStatus(ref) {
             });
             const statusData = await check.json();
 
-            // Logika Status Berhasil
+            // Logika Status Berhasil (Sesuaikan dengan respon asli Hokto)
+            // Asumsi: statusData.status === "PAID"
             if (statusData.status === "PAID" || statusData.data?.status === "PAID") {
-                clearInterval(checkTimer);
+                clearInterval(window.checkTimer);
                 tampilkanSukses();
             }
         } catch (err) {
             console.log("Mengecek pembayaran...");
         }
 
-        // Berhenti cek jika sudah lebih dari 10 menit (opsional)
+        // Berhenti cek jika sudah lebih dari 10 menit (120 * 5 detik)
         if (pollingCounter > 120) {
-            clearInterval(checkTimer);
-            alert("Sesi pembayaran berakhir. Silakan refresh.");
+            clearInterval(window.checkTimer);
+            alert("Sesi pembayaran berakhir. Silakan generate ulang.");
+            location.reload();
         }
     }, 5000); // Cek setiap 5 detik
 }
