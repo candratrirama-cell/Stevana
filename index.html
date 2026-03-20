@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donasi @maramadhona</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .neo-box {
+            border: 3px solid black;
+            box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
+        }
+        .neo-btn:active {
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,1);
+            transform: translate(4px, 4px);
+        }
+    </style>
+</head>
+<body class="bg-yellow-400 flex items-center justify-center min-h-screen p-4 font-mono">
+
+    <div class="bg-white p-8 rounded-none neo-box w-full max-w-md text-center">
+        <h1 class="text-3xl font-black mb-2 uppercase">Donasi @maramadhona</h1>
+        <p class="mb-6 font-bold border-b-2 border-black pb-2">Minimal Rp 100</p>
+
+        <div id="setup-area">
+            <input type="number" id="amount" min="100" placeholder="00.00" 
+                class="w-full p-4 border-4 border-black font-bold text-xl mb-4 focus:outline-none">
+            <button onclick="prosesDonasi()" id="btn-pay"
+                class="w-full bg-blue-500 text-white font-black py-4 text-xl neo-box neo-btn uppercase tracking-widest">
+                GAS DONASI!
+            </button>
+        </div>
+
+        <div id="qris-area" class="hidden mt-4">
+            <p class="font-bold mb-4">SCAN DISINI:</p>
+            <div class="border-4 border-black p-2 inline-block bg-white">
+                <img id="qris-image" src="" alt="QRIS" class="mx-auto w-64 h-64">
+            </div>
+            <p class="mt-4 font-black animate-bounce text-red-600 uppercase">Menunggu Pembayaran...</p>
+        </div>
+
+        <div id="success-area" class="hidden mt-4">
+            <div class="text-6xl mb-4">🔥</div>
+            <h2 class="text-2xl font-black uppercase">Mantap Bang!</h2>
+            <p class="font-bold">Donasi masuk. Terima kasih banyak!</p>
+            <button onclick="location.reload()" class="mt-6 text-sm underline font-bold">Donasi Lagi?</button>
+        </div>
+    </div>
+
+    <script src="payment-system.js"></script>
+</body>
+</html>
