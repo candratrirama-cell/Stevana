@@ -8,173 +8,119 @@
     <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap');
-        
-        body { font-family: 'Space Grotesk', sans-serif; }
         .neo-brutalism {
             border: 4px solid black;
-            box-shadow: 10px 10px 0px 0px rgba(0,0,0,1);
+            box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
             border-radius: 0px;
-        }
-        .neo-btn {
-            border: 3px solid black;
-            box-shadow: 5px 5px 0px 0px rgba(0,0,0,1);
-            transition: all 0.1s;
         }
         .neo-btn:active {
             box-shadow: 0px 0px 0px 0px rgba(0,0,0,1);
-            transform: translate(5px, 5px);
+            transform: translate(4px, 4px);
         }
-        input { border-radius: 0px !important; }
     </style>
 </head>
-<body class="bg-yellow-400 flex items-center justify-center min-h-screen p-6">
+<body class="bg-yellow-400 flex items-center justify-center min-h-screen p-4 font-mono">
 
     <div class="bg-white p-8 neo-brutalism w-full max-w-md text-center">
-        <h1 class="text-3xl font-black mb-1 uppercase italic tracking-tighter">Donasi @maramadhona</h1>
-        <p class="mb-6 font-bold border-b-4 border-black pb-2 text-sm uppercase">Support Digital Creator</p>
+        <h1 class="text-2xl font-bold mb-2 uppercase italic">Donasi @maramadhona</h1>
+        <p class="mb-6 font-bold border-b-2 border-black pb-2 text-xs">MINIMAL DONASI RP 100</p>
 
         <div id="setup-area">
-            <label class="block text-left font-black mb-2 uppercase text-xs">Masukkan Nominal (Min 100):</label>
-            <input type="number" id="amount" min="100" placeholder="Contoh: 5000" 
-                class="w-full p-4 border-4 border-black font-black text-2xl mb-6 focus:outline-none focus:bg-yellow-50">
-            
-            <button onclick="prosesDonasi()" id="btn-pay"
-                class="w-full bg-cyan-400 text-black font-black py-4 text-xl neo-btn uppercase tracking-widest hover:bg-cyan-300">
-                GENERATE QRIS
+            <input type="number" id="amount" min="100" placeholder="MASUKKAN NOMINAL" 
+                class="w-full p-4 border-4 border-black font-bold mb-4 focus:outline-none focus:bg-yellow-50">
+            <button onclick="generateDonasi()" id="btn-pay"
+                class="w-full bg-blue-500 text-white font-bold py-4 neo-brutalism neo-btn uppercase tracking-widest">
+                BUAT QRIS
             </button>
         </div>
 
-        <div id="qris-area" class="hidden animate-in fade-in zoom-in duration-300">
-            <p class="font-black mb-4 text-lg uppercase bg-black text-white py-1">Scan QRIS Di Bawah</p>
-            
-            <div class="border-4 border-black p-4 inline-block bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-                <canvas id="qris-canvas" class="mx-auto"></canvas>
+        <div id="qris-area" class="hidden mt-4">
+            <p class="font-bold mb-4 uppercase">SCAN QRIS DISINI:</p>
+            <div class="border-4 border-black p-4 inline-block bg-white shadow-inner">
+                <canvas id="canvas-qris" class="mx-auto"></canvas>
             </div>
-
-            <div class="mt-6 p-3 border-2 border-dashed border-black">
-                <p id="display-amount" class="text-3xl font-black text-black"></p>
-                <p class="text-xs font-bold uppercase text-gray-500">Partner Ref: <span id="display-ref"></span></p>
-            </div>
-            
-            <div class="mt-6 flex items-center justify-center gap-2">
-                <div class="w-3 h-3 bg-red-600 rounded-full animate-ping"></div>
-                <p class="font-black text-red-600 uppercase italic">Menunggu Pembayaran...</p>
-            </div>
+            <p id="info-amount" class="mt-4 text-2xl font-black text-blue-600"></p>
+            <p class="mt-2 font-bold animate-pulse text-red-600 uppercase italic">Menunggu Pembayaran...</p>
         </div>
 
-        <div id="success-area" class="hidden">
-            <div class="text-8xl mb-4 rotate-12">🎉</div>
-            <h2 class="text-4xl font-black uppercase text-green-600 leading-none">BERHASIL!<br>TERIMA KASIH</h2>
-            <p class="font-bold mt-4 border-2 border-black p-2 bg-green-100">Donasi Anda telah diterima sistem.</p>
-            <button onclick="location.reload()" class="mt-8 text-sm font-black underline uppercase hover:text-blue-600 italic">Kembali ke Awal</button>
+        <div id="success-area" class="hidden mt-4">
+            <div class="text-6xl mb-4">🚀</div>
+            <h2 class="text-2xl font-black uppercase text-green-600">PEMBAYARAN MASUK!</h2>
+            <p class="font-bold uppercase">Terima kasih banyak, Bang @maramadhona!</p>
+            <button onclick="location.reload()" class="mt-6 text-sm underline font-bold">KEMBALI</button>
         </div>
     </div>
 
     <script>
-        // --- CONFIGURASI ---
         const API_KEY = "91b24c8aeb3d364a80742a847797553b";
-        const BASE_URL = "https://hokto.my.id/produksi/payment/";
-        let pollingTimer;
+        let intervalCek;
 
-        async function prosesDonasi() {
-            const inputAmount = document.getElementById('amount');
+        async function generateDonasi() {
+            const amount = document.getElementById('amount').value;
             const btn = document.getElementById('btn-pay');
-            const amount = parseInt(inputAmount.value);
 
-            if (isNaN(amount) || amount < 100) {
-                alert("Minimal donasi Rp 100 ya Bang!");
+            if (amount < 100) {
+                alert("Minimal Rp 100!");
                 return;
             }
 
-            // Loading State
             btn.disabled = true;
-            btn.innerText = "WAIT A SECOND...";
-            const partnerRef = "MARA-" + Math.floor(Math.random() * 1000000);
+            btn.innerText = "SABAR...";
+            const refID = "MARA-" + Date.now();
 
             try {
-                // 1. Request QRIS ke API
-                const response = await fetch(`${BASE_URL}?api=create_qris`, {
+                const res = await fetch("https://hokto.my.id/produksi/payment/?api=create_qris", {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-API-KEY": API_KEY
-                    },
-                    body: JSON.stringify({
-                        amount: amount,
-                        partnerReferenceNo: partnerRef
-                    })
+                    headers: { "X-API-KEY": API_KEY, "Content-Type": "application/json" },
+                    body: JSON.stringify({ amount: parseInt(amount), partnerReferenceNo: refID })
                 });
 
-                const result = await response.json();
+                const data = await res.json();
                 
-                // Ambil data string QRIS (Biasanya diawali 000201...)
-                const rawQRData = result.qrString || (result.data ? result.data.qrString : null);
+                // Ambil teks QRIS dari respon API (qrString)
+                const qrText = data.qrString || (data.data ? data.data.qrString : null);
 
-                if (rawQRData) {
-                    const canvas = document.getElementById('qris-canvas');
-                    
-                    // 2. Render ke Canvas menggunakan library qrcode.js
-                    QRCode.toCanvas(canvas, rawQRData, { 
-                        width: 280,
-                        margin: 2,
-                        color: {
-                            dark: '#000000',
-                            light: '#FFFFFF'
-                        }
-                    }, function (error) {
-                        if (error) {
-                            console.error(error);
-                            alert("Gagal merender gambar QRIS.");
-                        } else {
-                            // Munculkan Tampilan QRIS
-                            document.getElementById('display-amount').innerText = `Rp ${amount.toLocaleString('id-ID')}`;
-                            document.getElementById('display-ref').innerText = partnerRef;
-                            document.getElementById('setup-area').classList.add('hidden');
-                            document.getElementById('qris-area').classList.remove('hidden');
-
-                            // 3. Jalankan Cek Status Otomatis
-                            mulaiCekStatus(partnerRef);
-                        }
+                if (qrText) {
+                    // Merubah teks QRIS menjadi Gambar di Canvas
+                    const canvas = document.getElementById('canvas-qris');
+                    QRCode.toCanvas(canvas, qrText, { width: 250, margin: 2 }, function (error) {
+                        if (error) console.error(error);
+                        
+                        document.getElementById('info-amount').innerText = "Rp " + parseInt(amount).toLocaleString();
+                        document.getElementById('setup-area').classList.add('hidden');
+                        document.getElementById('qris-area').classList.remove('hidden');
+                        
+                        // Cek status tiap 5 detik
+                        mulaiPolling(refID);
                     });
                 } else {
-                    alert("Gagal mendapatkan data QRIS. Cek API Key Anda.");
+                    alert("Gagal ambil data QRIS. Cek saldo/API Key.");
                     btn.disabled = false;
-                    btn.innerText = "GENERATE QRIS";
+                    btn.innerText = "BUAT QRIS";
                 }
-
             } catch (err) {
-                console.error(err);
-                alert("Koneksi Error. Pastikan internet aktif!");
+                alert("Error koneksi!");
                 btn.disabled = false;
-                btn.innerText = "GENERATE QRIS";
             }
         }
 
-        function mulaiCekStatus(ref) {
-            pollingTimer = setInterval(async () => {
+        function mulaiPolling(ref) {
+            intervalCek = setInterval(async () => {
                 try {
-                    const res = await fetch(`${BASE_URL}?api=check_status&partnerReferenceNo=${ref}`, {
+                    const res = await fetch(`https://hokto.my.id/produksi/payment/?api=check_status&partnerReferenceNo=${ref}`, {
                         headers: { "X-API-KEY": API_KEY }
                     });
                     const data = await res.json();
 
-                    // Logika: Jika status dari API adalah PAID (Sudah Bayar)
                     if (data.status === "PAID" || (data.data && data.data.status === "PAID")) {
-                        clearInterval(pollingTimer);
-                        tampilkanSukses();
+                        clearInterval(intervalCek);
+                        document.getElementById('qris-area').classList.add('hidden');
+                        document.getElementById('success-area').classList.remove('hidden');
                     }
                 } catch (e) {
-                    console.log("Sedang mengecek status pembayaran...");
+                    console.log("Cek...");
                 }
-            }, 5000); // Cek setiap 5 detik
-        }
-
-        function tampilkanSukses() {
-            document.getElementById('qris-area').classList.add('hidden');
-            document.getElementById('success-area').classList.remove('hidden');
-            // Tambahkan efek suara jika mau
-            console.log("Pembayaran Berhasil Diterima!");
+            }, 5000);
         }
     </script>
 </body>
