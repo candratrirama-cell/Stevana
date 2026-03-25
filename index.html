@@ -2,166 +2,666 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Donasi @maramadhona</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Theme Builders by merss</title>
     <style>
-        :root { --primary-blue: #007bff; --soft-blue: #e7f1ff; }
-        body { background-color: #f0f4f8; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding-top: 40px; }
-        .donation-card { max-width: 480px; margin: auto; border: none; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); background: #ffffff; overflow: hidden; }
-        .card-header-blue { background: var(--primary-blue); color: white; padding: 30px; text-align: center; border-radius: 0 0 40px 40px; }
-        #qrcode { margin: auto; padding: 15px; background: white; border-radius: 15px; border: 2px solid var(--soft-blue); }
-        .amount-display { font-size: 2rem; font-weight: 800; color: var(--primary-blue); }
-        .btn-donate { background-color: var(--primary-blue); border: none; border-radius: 12px; padding: 15px; font-weight: bold; transition: 0.3s; }
-        .btn-donate:hover { background-color: #0056b3; transform: translateY(-2px); }
-        .status-badge { display: inline-block; padding: 8px 16px; border-radius: 50px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
-        .status-waiting { background: #fff3cd; color: #856404; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        :root {
+            --bg-color: #f0f2f5;
+            --panel-bg: rgba(255, 255, 255, 0.8);
+            --item-bg: #ffffff;
+            --accent: #007aff;
+            --accent-light: rgba(0, 122, 255, 0.1);
+            --danger: #ff3b30;
+            --text-main: #1c1c1e;
+            --text-sub: #8e8e93;
+            --radius-lg: 32px;
+            --radius-md: 20px;
+            --glass: blur(25px) saturate(180%);
+        }
+
+        body.dark-mode {
+            --bg-color: #000000;
+            --panel-bg: rgba(28, 28, 30, 0.9);
+            --item-bg: #1c1c1e;
+            --text-main: #ffffff;
+            --text-sub: #a1a1a6;
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            -webkit-tap-highlight-color: transparent; 
+            transition: background-color 0.4s, color 0.4s, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        body, html {
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow: hidden; 
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .btn-icon svg, .wp-box svg, .icon-box svg {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .app-shell {
+            width: 100%; 
+            height: 100dvh; 
+            display: flex; 
+            flex-direction: column;
+            background: var(--panel-bg); 
+            backdrop-filter: var(--glass);
+            -webkit-backdrop-filter: var(--glass);
+            position: relative; 
+        }
+
+        .nav-header {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 20px; 
+            z-index: 100;
+            background: transparent;
+        }
+
+        .btn-icon {
+            width: 48px; 
+            height: 48px; 
+            background: var(--item-bg); 
+            border-radius: 16px;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-main);
+        }
+        .btn-icon svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+        .theme-input {
+            flex: 1; 
+            margin: 0 12px; 
+            background: var(--item-bg); 
+            border: 1.5px solid transparent;
+            padding: 12px 20px; 
+            border-radius: 18px; 
+            text-align: center; 
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-main); 
+            outline: none;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .theme-input:focus { border-color: var(--accent); }
+
+        .panels-container { 
+            flex: 1; 
+            position: relative; 
+            overflow-y: auto; 
+            padding-bottom: 30px;
+            scrollbar-width: none;
+        }
+        .panels-container::-webkit-scrollbar { display: none; }
+
+        .view-panel {
+            padding: 0 20px;
+            display: none; 
+            flex-direction: column;
+            animation: fadeIn 0.5s ease;
+        }
+        .view-panel.active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .wp-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 15px; 
+            margin-bottom: 25px; 
+        }
+        .wp-box {
+            background: var(--item-bg); 
+            aspect-ratio: 9/16; 
+            border-radius: 24px;
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center;
+            font-size: 12px; 
+            font-weight: 800; 
+            color: var(--text-sub); 
+            cursor: pointer;
+            overflow: hidden; 
+            position: relative;
+            border: 2px dashed rgba(0,0,0,0.1);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+        .dark-mode .wp-box { border-color: rgba(255,255,255,0.1); }
+        .wp-box img { width: 100%; height: 100%; object-fit: cover; position: absolute; }
+
+        .btn-delete {
+            position: absolute; top: 10px; right: 10px;
+            width: 28px; height: 28px; background: var(--danger);
+            color: white; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center;
+            font-size: 14px; z-index: 10;
+            box-shadow: 0 4px 10px rgba(255,59,48,0.3);
+            opacity: 0; pointer-events: none; transform: scale(0.5);
+        }
+        .has-data .btn-delete { opacity: 1; pointer-events: auto; transform: scale(1); }
+
+        .filter-nav {
+            display: flex; 
+            gap: 12px; 
+            overflow-x: auto; 
+            padding: 15px 0;
+            margin: 10px 0;
+            scrollbar-width: none;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .filter-nav::-webkit-scrollbar { display: none; }
+        .chip {
+            padding: 12px 20px; 
+            background: var(--item-bg); 
+            border-radius: 16px;
+            font-size: 13px; 
+            font-weight: 800; 
+            color: var(--text-sub);
+            white-space: nowrap; 
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .chip.active { background: var(--accent); color: white; box-shadow: 0 6px 15px rgba(0,122,255,0.4); }
+
+        .selector-card {
+            background: var(--item-bg); 
+            border-radius: var(--radius-lg); 
+            padding: 40px 0;
+            margin-bottom: 25px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+        }
+        
+        .scroll-wrapper {
+            display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+            padding: 0 35%; gap: 30px; scrollbar-width: none; align-items: center;
+            min-height: 180px;
+        }
+        .scroll-wrapper::-webkit-scrollbar { display: none; }
+        
+        .app-slot {
+            scroll-snap-align: center; flex: 0 0 100px; display: flex;
+            flex-direction: column; align-items: center; 
+        }
+        .app-slot.active { transform: scale(1.25); }
+        
+        .icon-box {
+            width: 90px; height: 90px; background: var(--bg-color); border-radius: 26px;
+            display: flex; align-items: center; justify-content: center;
+            border: 3px solid transparent; overflow: hidden; position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+        .app-slot.active .icon-box { 
+            border-color: var(--accent); 
+            background: var(--item-bg);
+            box-shadow: 0 15px 30px rgba(0,122,255,0.3); 
+        }
+        
+        .icon-box img { width: 100%; height: 100%; object-fit: cover; }
+        .icon-box svg { width: 35px; height: 35px; stroke: var(--text-sub); fill: none; stroke-width: 1.5; }
+        .app-label { font-size: 12px; color: var(--text-main); font-weight: 800; margin-top: 15px; opacity: 0.5; text-align: center;}
+        .app-slot.active .app-label { opacity: 1; }
+
+        .btn-action {
+            width: 100%; padding: 22px; border-radius: 24px; border: none;
+            font-weight: 800; cursor: pointer; font-size: 16px;
+            background: var(--accent); color: white;
+            box-shadow: 0 8px 25px rgba(0,122,255,0.3); 
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            margin-top: 10px;
+        }
+        .btn-action:active { transform: scale(0.96); }
+        .btn-green { background: #34c759; box-shadow: 0 8px 25px rgba(52,199,89,0.3); }
+        .btn-red { background: #ff3b30; box-shadow: 0 8px 25px rgba(255,59,48,0.3); }
+        .btn-secondary { background: var(--item-bg); color: var(--text-main); border: 1px solid rgba(0,0,0,0.05); }
+
+        #pList { flex: 1; padding: 10px 0; }
+        .p-item { 
+            background: var(--item-bg); margin-bottom: 15px; padding: 18px; 
+            border-radius: 22px; display: flex; align-items: center; gap: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.04);
+        }
+        .p-item img { width: 55px; height: 55px; border-radius: 16px; object-fit: cover; }
+        .p-item b { font-size: 15px; display: block; }
+        .p-item small { color: var(--text-sub); font-size: 12px; }
+
+        input[type="file"] { display: none; }
+
+        .setting-row {
+            background: var(--item-bg); padding: 22px; border-radius: 22px;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            cursor: pointer;
+        }
     </style>
 </head>
-<body>
-
-<div class="container pb-5">
-    <div class="card donation-card">
-        <div class="card-header-blue">
-            <h3 class="fw-bold m-0">Donasi @maramadhona</h3>
-            <p class="m-0 mt-2 opacity-75">Dukung kreativitas melalui donasi QRIS</p>
-        </div>
-        
-        <div class="card-body p-4">
-            <div id="input-area">
-                <div class="mb-4">
-                    <label class="form-label small fw-bold text-secondary text-uppercase">Nominal Donasi (Min 100)</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0 fw-bold">Rp</span>
-                        <input type="number" id="amount" class="form-control form-control-lg border-start-0 fw-bold" value="5000" min="100">
-                    </div>
-                </div>
-                <button onclick="generateDonasi()" id="btn-pay" class="btn btn-primary w-100 btn-donate fs-5">BUAT QRIS PEMBAYARAN</button>
-            </div>
-
-            <div id="loading" class="text-center mt-3 d-none">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p class="mt-2 text-muted">Menghubungkan ke API Hokto...</p>
-            </div>
-
-            <div id="qris-result" class="text-center mt-2 d-none">
-                <div class="status-badge status-waiting mb-3">Menunggu Pembayaran...</div>
-                <p class="mb-1 text-muted small uppercase fw-bold">Total yang harus dibayar:</p>
-                <p class="amount-display mb-3">Rp <span id="final-amount"></span></p>
-                
-                <div id="qrcode" class="d-flex justify-content-center mb-3"></div>
-                
-                <div class="bg-light p-3 rounded-4 mb-3 text-start">
-                    <div class="d-flex justify-content-between small mb-1">
-                        <span class="text-muted">Ref ID:</span>
-                        <span id="ref-id" class="fw-bold text-dark"></span>
-                    </div>
-                    <div class="d-flex justify-content-between small">
-                        <span class="text-muted">Metode:</span>
-                        <span class="fw-bold text-dark text-uppercase">QRIS All Payment</span>
-                    </div>
-                </div>
-                <p class="text-muted x-small italic" style="font-size: 11px;">Halaman akan otomatis berubah jika pembayaran berhasil.</p>
-            </div>
-
-            <div id="success-area" class="text-center d-none py-4">
-                <div class="mb-4">
-                    <span style="font-size: 80px;">✅</span>
-                </div>
-                <h3 class="fw-bold text-success">Donasi Berhasil!</h3>
-                <p class="text-muted">Terima kasih banyak atas dukungannya bang @maramadhona.</p>
-                <button onclick="location.reload()" class="btn btn-outline-primary btn-sm mt-3 px-4">Kembali ke Awal</button>
+<body class="light-mode"> 
+    <div id="ads-go-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(10px); z-index:999999; justify-content:center; align-items:center; opacity:0; transition: opacity 0.4s ease;">
+        <div id="ads-go-box" style="position:relative; width:85%; max-width:360px; background:#fff; border-radius:30px; overflow:hidden; box-shadow:0 25px 50px rgba(0,0,0,0.3); transform:scale(0.85); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+            <button onclick="tutupIklanAdsGo()" style="position:absolute; top:15px; right:15px; width:35px; height:35px; border-radius:50%; border:none; background:rgba(255, 118, 117, 0.9); color:#fff; font-weight:bold; cursor:pointer; z-index:1000001; box-shadow:0 4px 10px rgba(0,0,0,0.2); display:flex; justify-content:center; align-items:center; font-family: sans-serif;">✕</button>
+            <div style="width:100%; cursor:pointer;">
+                <img id="ads-go-img" src="" style="width:100%; display:block; transition: 0.3s; -webkit-user-drag: none;">
             </div>
         </div>
     </div>
-</div>
 
-<script>
-const API_KEY = "91b24c8aeb3d364a80742a847797553b";
-const BASE_URL = "https://hokto.my.id/produksi/payment/";
-let checkTimer;
+    <div class="app-shell">
+        <header class="nav-header">
+            <button class="btn-icon" onclick="handleNav('viewSettings')">
+                <svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            </button>
+            <input type="text" id="themeName" class="theme-input" placeholder="Nama Tema..." oninput="saveData()">
+            <button class="btn-icon" onclick="handleNav('viewProject')">
+                <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+        </header>
 
-function formatRupiah(angka) {
-    return new Intl.NumberFormat('id-ID').format(angka);
-}
+        <div class="panels-container">
+            <div id="viewEditor" class="view-panel active">
+                <div class="wp-grid">
+                    <div class="wp-box" id="box-f1" onclick="trigger('f1')">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom:8px"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                        <span>WPP LOCK</span>
+                        <div class="btn-delete" onclick="delWP('f1','wallpaper/lockscreen_wallpaper.jpg',event)">✕</div>
+                        <input type="file" id="f1" accept="image/*" onchange="pv(this,'wallpaper/lockscreen_wallpaper.jpg')">
+                    </div>
+                    <div class="wp-box" id="box-f2" onclick="trigger('f2')">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom:8px"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        <span>WPP HOME</span>
+                        <div class="btn-delete" onclick="delWP('f2','wallpaper/wallpaper.jpg',event)">✕</div>
+                        <input type="file" id="f2" accept="image/*" onchange="pv(this,'wallpaper/wallpaper.jpg')">
+                    </div>
+                    <div class="wp-box" id="box-f3" onclick="trigger('f3')">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom:8px"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <span>PREV 1</span>
+                        <div class="btn-delete" onclick="delWP('f3','preview/preview_lockscreen_0.jpg',event)">✕</div>
+                        <input type="file" id="f3" accept="image/*" onchange="pv(this,'preview/preview_lockscreen_0.jpg')">
+                    </div>
+                    <div class="wp-box" id="box-f4" onclick="trigger('f4')">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom:8px"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                        <span>PREV 2</span>
+                        <div class="btn-delete" onclick="delWP('f4','preview/preview_launcher_0.jpg',event)">✕</div>
+                        <input type="file" id="f4" accept="image/*" onchange="pv(this,'preview/preview_launcher_0.jpg')">
+                    </div>
+                </div>
 
-async function generateDonasi() {
-    const amount = document.getElementById('amount').value;
-    const btn = document.getElementById('btn-pay');
-    const loading = document.getElementById('loading');
-    const inputArea = document.getElementById('input-area');
-    const resultArea = document.getElementById('qris-result');
-    const qrDiv = document.getElementById('qrcode');
-    
-    if (amount < 100) { return alert("Minimal donasi Rp 100"); }
+                <div class="filter-nav">
+                    <div class="chip active" onclick="filterData('ALL', this)">SEMUA</div>
+                    <div class="chip" onclick="filterData('SISTEM', this)">SISTEM</div>
+                    <div class="chip" onclick="filterData('GOOGLE', this)">GOOGLE</div>
+                    <div class="chip" onclick="filterData('ICONS', this)">ICONS</div>
+                    <div class="chip" onclick="filterData('SOSMED', this)">SOSMED</div>
+                    <div class="chip" onclick="filterData('GAMES', this)">GAMES</div>
+                    <div class="chip" onclick="filterData('LAINNYA', this)">LAINNYA</div>
+                </div>
 
-    qrDiv.innerHTML = "";
-    loading.classList.remove('d-none');
-    btn.disabled = true;
+                <div class="selector-card">
+                    <div class="scroll-wrapper" id="scroller"></div>
+                </div>
+                
+                <button class="btn-action" onclick="addToProject()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    TAMBAH KE PROJECT
+                </button>
+            </div>
 
-    const uniqueInvoice = "MARA-" + Date.now();
+            <div id="viewProject" class="view-panel">
+                <h3 style="margin: 10px 0 20px; font-weight: 900; font-size: 22px;">Aset Tersimpan</h3>
+                <div id="pList"></div>
+                <div style="display: flex; gap: 12px; margin-top: 20px;">
+                    <button class="btn-action btn-red" onclick="resetAll()" style="flex:1">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        HAPUS
+                    </button>
+                    <button class="btn-action btn-green" onclick="exportZ()" style="flex:1">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        EKSPOR
+                    </button>
+                </div>
+                <button class="btn-action btn-secondary" onclick="handleNav('viewEditor')">KEMBALI</button>
+            </div>
 
-    try {
-        const response = await fetch(`${BASE_URL}?api=create_qris`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-API-KEY': API_KEY },
-            body: JSON.stringify({ amount: parseInt(amount), partnerReferenceNo: uniqueInvoice })
-        });
+            <div id="viewSettings" class="view-panel">
+                <h3 style="margin: 10px 0 25px; font-weight: 900; font-size: 22px;">Pengaturan</h3>
+                <div class="setting-row" onclick="dark()">
+                    <div style="display:flex; align-items:center; gap:15px;">
+                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                         <span>Mode Tampilan</span>
+                    </div>
+                    <small id="modeText">Terang</small>
+                </div>
+                <div class="setting-row">
+                    <span>Versi App</span>
+                    <small style="font-weight:800; color:var(--accent)">v1.5 by mers</small>
+                </div>
+                <button class="btn-action btn-secondary" style="margin-top:20px;" onclick="handleNav('viewEditor')">KEMBALI</button>
+            </div>
+        </div>
+    </div>
 
-        const data = await response.json();
-        
-        if (data.status === "success" && (data.qrContent || data.qrString)) {
-            const qrText = data.qrContent || data.qrString;
-            document.getElementById('final-amount').innerText = formatRupiah(amount);
-            document.getElementById('ref-id').innerText = uniqueInvoice;
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        // --- ADS GO SCRIPT ---
+        (async function() {
+            const BIN_ID = "69aba10b43b1c97be9bc6862";
+            const MASTER_KEY = "$2a$10$go25lr52o.r3GKWOrNSUiO6Gdv52kcAcNS56vMiiIhlM5yX3X2ON6";
+            const currentURL = window.location.href; 
 
-            new QRCode(qrDiv, {
-                text: qrText,
-                width: 250,
-                height: 250,
-                colorDark : "#000000",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.M
-            });
+            try {
+                const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+                    headers: { "X-Master-Key": MASTER_KEY }
+                });
+                const result = await response.json();
+                const adsList = result.record;
 
-            inputArea.classList.add('d-none');
-            resultArea.classList.remove('d-none');
-            
-            // Mulai cek status otomatis tiap 5 detik
-            mulaiCekPembayaran(uniqueInvoice);
-        } else {
-            alert("Gagal membuat QRIS. " + (data.message || ""));
-        }
-    } catch (error) {
-        alert("Koneksi gagal!");
-    } finally {
-        loading.classList.add('d-none');
-        btn.disabled = false;
-    }
-}
+                if (Array.isArray(adsList)) {
+                    const activeAd = adsList.find(ad => 
+                        ad.tampilkan === true && 
+                        (currentURL.includes(ad.link_target) || ad.link_target === "*")
+                    );
 
-function mulaiCekPembayaran(ref) {
-    checkTimer = setInterval(async () => {
-        try {
-            const response = await fetch(`${BASE_URL}?api=check_status&partnerReferenceNo=${ref}`, {
-                headers: { 'X-API-KEY': API_KEY }
-            });
-            const data = await response.json();
-
-            // Sesuaikan dengan respon "PAID" dari API Hokto
-            if (data.status === "PAID" || (data.data && data.data.status === "PAID")) {
-                clearInterval(checkTimer);
-                document.getElementById('qris-result').classList.add('d-none');
-                document.getElementById('success-area').classList.remove('d-none');
+                    if (activeAd) {
+                        const overlay = document.getElementById('ads-go-overlay');
+                        const box = document.getElementById('ads-go-box');
+                        const img = document.getElementById('ads-go-img');
+                        img.src = activeAd.poster;
+                        img.addEventListener('click', function() {
+                            window.open(activeAd.link_promosi, '_blank');
+                        });
+                        overlay.style.display = 'flex';
+                        setTimeout(() => {
+                            overlay.style.opacity = '1';
+                            box.style.transform = 'scale(1)';
+                        }, 200);
+                    }
+                }
+            } catch (error) {
+                console.error("Ads Go v3: Terjadi kendala koneksi database.");
             }
-        } catch (e) {
-            console.log("Menunggu dana masuk...");
-        }
-    }, 5000);
-}
-</script>
+        })();
 
+        function tutupIklanAdsGo() {
+            const overlay = document.getElementById('ads-go-overlay');
+            overlay.style.opacity = '0';
+            document.getElementById('ads-go-box').style.transform = 'scale(0.8)';
+            setTimeout(() => { overlay.style.display = 'none'; }, 400);
+        }
+
+        // --- THEME BUILDER SCRIPT ---
+        const dbMaster = [
+            {n:"Gallery", p:"com.transsion.ai_gallery", s1:"Gallery", s2:"AI_Gallery", c:"SISTEM"},
+            {n:"Kamera", p:"com.transsion.camera", s1:"Camera", s2:"Camera_Infinix", c:"SISTEM"},
+            {n:"Pengaturan", p:"com.android.settings", s1:"Settings", s2:"icon_settings", c:"SISTEM"},
+            {n:"Telepon", p:"com.android.contacts", s1:"Phone", s2:"Dialer", c:"SISTEM"},
+            {n:"Messages", p:"com.android.mms", s1:"Messages", s2:"SMS", c:"SISTEM"},
+            {n:"File Manager", p:"com.transsion.filemanager", s1:"File", s2:"FileManager", c:"SISTEM"},
+            {n:"Phone Master", p:"com.transsion.phonemaster", s1:"PhoneMaster", s2:"Cleaner", c:"SISTEM"},
+            {n:"XTheme", p:"com.transsion.XTheme", s1:"Theme", s2:"Theme_Store", c:"SISTEM"},
+            {n:"Kalkulator", p:"com.transsion.calculator", s1:"Calculator", s2:"Calc", c:"SISTEM"},
+            {n:"Jam", p:"com.ultraline.deskclock", s1:"Clock", s2:"Alarm", c:"SISTEM"},
+            {n:"Perekam Suara", p:"com.transsion.soundrecorder", s1:"Recorder", s2:"Voice", c:"SISTEM"},
+            {n:"Catatan", p:"com.transsion.notepad", s1:"Notepad", s2:"Notes", c:"SISTEM"},
+            {n:"Kompas", p:"com.transsion.compass.CompassActivity", s1:"Compass", s2:"Direction", c:"SISTEM"},
+            {n:"Radio FM", p:"com.transsion.fmradio", s1:"FM_Radio", s2:"Radio", c:"SISTEM"},
+            {n:"Cuaca ", p:"com.rlk.weathers.ui.main.MainActivity", s1:"Weather", s2:"com.rlk.weathers", c:"SISTEM"},
+            {n:"Hola Browser ", p:"com.talpa.hibrowser.framework.ui.HiStartActivity", s1:"Browser", s2:"com.talpa.hibrowser", c:"SISTEM"},
+            {n:"Kontak", p:"com.android.dialer.main.impl.MainActivity", s1:"Contacts", s2:"Kontak", c:"SISTEM"},
+            {n:"Folax", p:"com.transsion.ella.ai.aiability.help.activity.HelpActivity", s1:"Folax", s2:"com.transsion.aivoiceassistant", c:"SISTEM"},
+            {n:"Palm Store", p:"com.afmobi.palmplay.StartActivity", s1:"PalmStore", s2:"AppStore", c:"SISTEM"},
+            {n:"XClub", p:"com.transsion.xclub", s1:"XClub", s2:"Community", c:"SISTEM"},
+            {n:"Vskit", p:"com.vskit.video", s1:"Vskit", s2:"ShortVideo", c:"SISTEM"},
+            {n:"Boomplay", p:"com.afmobi.boomplaymusic", s1:"Boomplay", s2:"Music_Player", c:"SISTEM"},
+            {n:"Carlcare", p:"com.carlcare.framework", s1:"Carlcare", s2:"Service", c:"SISTEM"},
+            {n:"AHA Games", p:"com.transsion.ahagame", s1:"Aha", s2:"Game_Store", c:"SISTEM"},
+            {n:"YoParty", p:"com.transsion.yoparty", s1:"YoParty", s2:"Music_Sync", c:"SISTEM"},
+            {n:"Pengklona", p:"com.transsion.letswitch.MainActivity", s1:"Pengklona", s2:"com.transsion.mobilecloner.MainActivity", c:"SISTEM"},
+            {n:"SIMToolkit", p:"com.android.stk.StkMain", s1:"com.android.stk", s2:"SIMToolkit", c:"SISTEM"},
+            {n:"Xarena", p:"com.transsion.gamespace.activity.GameSpaceActivity", s1:"com.transsion.gamespace.app", s2:"Game Space", c:"SISTEM"},
+            {n:"Calendar ", p:"com.transsion.calendar", s1:"Calendar", s2:"kalendar", c:"SISTEM"},
+            {n:"YouTube", p:"com.google.android.youtube", s1:"YouTube", s2:"YT", c:"GOOGLE"},
+            {n:"Chrome", p:"com.android.chrome", s1:"Chrome", s2:"Browser", c:"GOOGLE"},
+            {n:"Play Store", p:"com.android.vending", s1:"PlayStore", s2:"Market", c:"GOOGLE"},
+            {n:"Gmail", p:"com.google.android.gm", s1:"Gmail", s2:"Email", c:"GOOGLE"},
+            {n:"Maps", p:"com.google.android.apps.maps", s1:"Maps", s2:"Location", c:"GOOGLE"},
+            {n:"Drive", p:"com.google.android.apps.docs", s1:"Drive", s2:"Cloud", c:"GOOGLE"},
+            {n:"Photos", p:"com.google.android.apps.photos", s1:"Photos", s2:"G_Gallery", c:"GOOGLE"},
+            {n:"Files by Google", p:"com.google.android.apps.nbu.files", s1:"GFiles", s2:"Cleaner_G", c:"GOOGLE"},
+            {n:"Asistent", p:"com.google.android.apps.assistant", s1:"com.google.android.apps.googleassistant.AssistantActivity", s2:"Asistent", c:"GOOGLE"},
+            {n:"Google TV", p:"com.google.android.videos.GoogleTvEntryPoint", s1:"com.google.android.videos.activity.LauncherActivity", s2:"GoogleTV", c:"GOOGLE"},
+            {n:"YouTube Musik", p:"com.google.android_apps.youtube.music.activities.MusicActivity", s1:"com.maxmpz.audioplayer.standard.adaptive", s2:"YtMusic", c:"GOOGLE"},
+            {n:"Yt Studio", p:"com.google.android.apps.youtube.creator.main.MainActivity", s1:"com.transsion.dtsaudio.activities.MainActivity", s2:"Studio", c:"GOOGLE"},
+            {n:"Google Safety", p:"com.google.android.apps.safetyhub.LauncherActivity", s1:"Keselamatan", s2:"Safety", c:"GOOGLE"},
+            {n:"GoogleMeet", p:"com.google.android.apps.tachyon.MainActivity", s1:"com.google.android.apps.tachyon", s2:"Duo", c:"GOOGLE"},
+            {n:"GoogleKalendar", p:"com.android.calendar.AllInOneActivity", s1:"com.google.android.calendar", s2:"Kalender", c:"GOOGLE"},
+            {n:"WhatsApp", p:"com.whatsapp", s1:"WhatsApp", s2:"WA", c:"SOSMED"},
+            {n:"Instagram", p:"com.instagram.android", s1:"Instagram", s2:"IG", c:"SOSMED"},
+            {n:"TikTok", p:"com.zhiliaoapp.musically", s1:"TikTok", s2:"TT", c:"SOSMED"},
+            {n:"Facebook", p:"com.facebook.katana", s1:"Facebook", s2:"FB", c:"SOSMED"},
+            {n:"Telegram", p:"org.telegram.messenger", s1:"Telegram", s2:"TG", c:"SOSMED"},
+            {n:"Icons Mask", p:"icon_mask", s1:"icon_mask", s2:"mask", c:"ICONS"},
+            {n:"Icons Background", p:"icon_bg", s1:"icon_back", s2:"back", c:"ICONS"},
+            {n:"Icons Border", p:"icon_top", s1:"icon_border", s2:"border", c:"ICONS"},
+            {n:"ZArchiver", p:"ru.zdevs.zarchiver.ZArchiver", s1:"ZArchiver", s2:"ru.zdevs.zarchiver", c:"LAINNYA"},
+            {n:"MT manager", p:"bin.mt.plus.MainLightIcon", s1:"bin.mt.plus", s2:"MT Manager", c:"LAINNYA"},
+            {n:"Pinterest", p:"com.pinterest.activity.PinterestActivity", s1:"Pinterest", s2:"Pin", c:"LAINNYA"},
+            {n:"Minecraft", p:"com.mojang.minecraftpe.MainActivity", s1:"com.mojang.minecraftpe", s2:"Minecraft", c:"GAMES"},
+            {n:"Block blast", p:"org.cocos2dx.javascript.AppActivity", s1:"com.block.juggle", s2:"Block blast ", c:"GAMES"},
+            {n:"Roblox", p:"com.roblox.client.startup.ActivitySplash", s1:"com.roblox.client", s2:"Roblox", c:"GAMES"}
+        ];
+
+        let uploadedIcons = JSON.parse(localStorage.getItem('mers_icons')) || {}; 
+        let extraAssets = JSON.parse(localStorage.getItem('mers_wpp')) || {};
+        let scrollTimer;
+
+        function saveData() {
+            localStorage.setItem('mers_icons', JSON.stringify(uploadedIcons));
+            localStorage.setItem('mers_wpp', JSON.stringify(extraAssets));
+            localStorage.setItem('mers_name', document.getElementById('themeName').value);
+        }
+
+        function trigger(id) { document.getElementById(id).click(); }
+
+        function renderScroller(cat = 'ALL') {
+            const sc = document.getElementById('scroller');
+            const data = cat === 'ALL' ? dbMaster : dbMaster.filter(i => i.c === cat);
+            
+            sc.innerHTML = data.map(item => {
+                const isUploaded = uploadedIcons[item.n];
+                return `
+                <div class="app-slot ${isUploaded ? 'has-data' : ''}" id="slot-${item.n}">
+                    <div class="icon-box" onclick="upLoadIcon('${item.n}')">
+                        <div class="btn-delete" onclick="delIcon('${item.n}', event)">✕</div>
+                        <div id="box-${item.n}">
+                            ${isUploaded ? `<img src="${isUploaded}">` : `
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                <line x1="12" y1="8" x2="12" y2="16"/>
+                                <line x1="8" y1="12" x2="16" y2="12"/>
+                            </svg>`}
+                        </div>
+                    </div>
+                    <div class="app-label">${item.n}</div>
+                </div>`;
+            }).join('');
+
+            const slots = sc.querySelectorAll('.app-slot');
+            sc.onscroll = () => {
+                cancelAnimationFrame(scrollTimer);
+                scrollTimer = requestAnimationFrame(() => {
+                    let min = Infinity, best = 0;
+                    const centerX = window.innerWidth / 2;
+                    slots.forEach((s, i) => {
+                        const rect = s.getBoundingClientRect();
+                        const dist = Math.abs((rect.left + rect.width / 2) - centerX);
+                        if(dist < min) { min = dist; best = i; }
+                        s.classList.remove('active');
+                    });
+                    if(slots[best]) slots[best].classList.add('active');
+                });
+            };
+            setTimeout(() => { sc.scrollBy(1, 0); if(slots[0]) slots[0].classList.add('active'); }, 100);
+        }
+
+        function upLoadIcon(name) {
+            const input = document.createElement('input');
+            input.type = 'file'; input.accept = 'image/*';
+            input.onchange = (e) => {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    uploadedIcons[name] = ev.target.result;
+                    renderScroller(document.querySelector('.chip.active').innerText === 'SEMUA' ? 'ALL' : document.querySelector('.chip.active').innerText);
+                    saveData();
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            };
+            input.click();
+        }
+
+        function delIcon(name, e) {
+            e.stopPropagation();
+            if(confirm("Hapus ikon ini?")) {
+                delete uploadedIcons[name];
+                saveData();
+                renderScroller(document.querySelector('.chip.active').innerText === 'SEMUA' ? 'ALL' : document.querySelector('.chip.active').innerText);
+            }
+        }
+
+        function pv(input, path) {
+            if(!input.files[0]) return;
+            const reader = new FileReader();
+            reader.onload = e => { 
+                extraAssets[path] = e.target.result;
+                const box = input.parentElement;
+                box.classList.add('has-data');
+                const title = box.querySelector('span').innerText;
+                box.innerHTML = `<img src="${e.target.result}"><span>${title}</span><div class="btn-delete" onclick="delWP('${input.id}','${path}',event)">✕</div><input type="file" id="${input.id}" accept="image/*" onchange="pv(this,'${path}')">`;
+                saveData();
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+
+        function delWP(id, path, e) {
+            e.stopPropagation();
+            delete extraAssets[path];
+            const box = document.getElementById('box-'+id);
+            box.classList.remove('has-data');
+            const titles = ["WPP LOCK", "WPP HOME", "PREV 1", "PREV 2"];
+            box.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom:8px"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg><span>${titles[parseInt(id.replace('f',''))-1]}</span><div class="btn-delete" onclick="delWP('${id}','${path}',event)">✕</div><input type="file" id="${id}" accept="image/*" onchange="pv(this,'${path}')">`;
+            saveData();
+        }
+
+        function handleNav(id) {
+            document.querySelectorAll('.view-panel').forEach(v => v.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(id === 'viewProject') renderProjectList();
+        }
+
+        function renderProjectList() {
+            const list = document.getElementById('pList');
+            const items = Object.keys(uploadedIcons);
+            list.innerHTML = items.length ? items.map(k => `
+                <div class="p-item">
+                    <img src="${uploadedIcons[k]}"> 
+                    <div><b>${k}</b><small>Ikon Terpasang</small></div>
+                    <svg style="margin-left:auto; color:#34c759" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>`).join('') : '<p style="text-align:center; padding:40px; color:#888;">Belum ada aset ditambahkan</p>';
+        }
+
+        function addToProject() {
+            if(Object.keys(uploadedIcons).length === 0 && Object.keys(extraAssets).length === 0) return alert("Pilih ikon atau wallpaper dulu!");
+            handleNav('viewProject');
+        }
+
+        function dark(init = false) {
+            const body = document.body;
+            const modeText = document.getElementById('modeText');
+            if (!init) {
+                body.classList.toggle('dark-mode');
+                localStorage.setItem('mers_theme_mode', body.classList.contains('dark-mode') ? 'dark' : 'light');
+            } else {
+                const saved = localStorage.getItem('mers_theme_mode');
+                if (saved === 'dark') body.classList.add('dark-mode');
+            }
+            modeText.innerText = body.classList.contains('dark-mode') ? 'Gelap' : 'Terang';
+        }
+
+        function filterData(cat, el) {
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            renderScroller(cat);
+        }
+
+        function resetAll() {
+            if(confirm("Merss, yakin mau hapus semua data project ini?")) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        async function exportZ() {
+            const zip = new JSZip();
+            const themeName = document.getElementById('themeName').value || "MerssTheme";
+            for (let name in uploadedIcons) {
+                const db = dbMaster.find(d => d.n === name);
+                const data = uploadedIcons[name].split(',')[1];
+                if(db) {
+                    zip.file(`res/drawable-xxhdpi/${db.p.replace(/\./g, '_')}.png`, data, {base64: true});
+                    if(db.s1) zip.file(`res/drawable-xxhdpi/${db.s1}.png`, data, {base64: true});
+                    if(db.s2) zip.file(`res/drawable-xxhdpi/${db.s2}.png`, data, {base64: true});
+                }
+            }
+            for (let path in extraAssets) {
+                zip.file(path, extraAssets[path].split(',')[1], {base64: true});
+            }
+            const content = await zip.generateAsync({type:"blob"});
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(content);
+            link.download = `${themeName}.zth`;
+            link.click();
+        }
+
+        window.onload = () => {
+            dark(true);
+            document.getElementById('themeName').value = localStorage.getItem('mers_name') || "";
+            for(let path in extraAssets) {
+                const keys = { 'wallpaper/lockscreen_wallpaper.jpg': 'f1', 'wallpaper/wallpaper.jpg': 'f2', 'preview/preview_lockscreen_0.jpg': 'f3', 'preview/preview_launcher_0.jpg': 'f4' };
+                if(keys[path]) {
+                    const id = keys[path];
+                    const box = document.getElementById('box-'+id);
+                    box.classList.add('has-data');
+                    const img = document.createElement('img');
+                    img.src = extraAssets[path];
+                    const title = box.querySelector('span').innerText;
+                    box.innerHTML = "";
+                    box.appendChild(img);
+                    box.innerHTML += `<span>${title}</span><div class="btn-delete" onclick="delWP('${id}','${path}',event)">✕</div><input type="file" id="${id}" accept="image/*" onchange="pv(this,'${path}')">`;
+                }
+            }
+            renderScroller();
+        };
+    </script>
 </body>
 </html>
